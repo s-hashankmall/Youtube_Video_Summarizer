@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Summary and Q&A</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            color: #c4302b;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .content-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            overflow-y: auto;    /* Ensure vertical scrolling for long content */
+            max-width: 100%;      /* Limit width to container */
+            width: 100%;          /* Prevent horizontal overflow */
+        }
+
+        .summary-box {
+            margin-bottom: 30px;
+        }
+
+        /* Ensure preformatted text wraps and no horizontal scroll */
+        pre {
+            white-space: pre-wrap;   /* Keep the preformatted structure, but allow wrapping */
+            word-wrap: break-word;   /* Break long words if necessary */
+            overflow-x: hidden;      /* Prevent horizontal scroll */
+        }
+
+        .qna-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .qna-input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .qna-button {
+            background-color: #c4302b;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .qna-button:hover {
+            background-color: #a32723;
+        }
+
+        .qna-loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* Ensure consistent behavior for qna results */
+        .qna-result {
+            margin-top: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            white-space: pre-wrap;   /* Ensure preformatted text wraps */
+            word-wrap: break-word;    /* Break long words */
+            overflow-x: hidden;       /* Prevent horizontal scroll */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Video Summary</h1>
+        <div class="content-box summary-box">
+            <!-- Summary text with pre-wrap formatting to maintain structure -->
+            <pre>{{ summary|safe }}</pre>
+        </div>
+
+        <h2>Ask a Question</h2>
+        <div class="content-box qna-section">
+            <form id="qna-form">
+                <input type="hidden" id="video-id" value="{{ video_id }}">
+                <input class="qna-input" type="text" id="question" name="question" placeholder="Type your question here..." required>
+                <button class="qna-button" type="submit">Ask</button>
+            </form>
+
+            <div class="qna-loading" id="loading">
+                <p><i class="fas fa-spinner fa-spin"></i> Searching for an answer...</p>
+            </div>
+
+            <div class="qna-result" id="qna-result">
+                <!-- Answer will be shown here with pre-wrap formatting -->
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery and Bootstrap Scripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $('#qna-form').on('submit', function(event) {
+            event.preventDefault();
+
+            var videoId = $('#video-id').val();
+            var question = $('#question').val();
+
+            $('#loading').show();
+            $('#qna-result').empty();
+
+            $.ajax({
+                url: "{% url 'qna' video_id=video_id %}",
+                method: 'GET',
+                data: { 'question': question },
+                success: function(data) {
+                    $('#loading').hide();
+                    if (data.answer) {
+                        $('#qna-result').html('<pre>' + data.answer + '</pre>');
+                    } else {
+                        $('#qna-result').html('<p>No answer available.</p>');
+                    }
+                },
+                error: function() {
+                    $('#loading').hide();
+                    $('#qna-result').html('<p>Error retrieving the answer.</p>');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
