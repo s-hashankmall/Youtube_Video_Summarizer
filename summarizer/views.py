@@ -5,8 +5,8 @@ from django.http import JsonResponse
 from youtube_transcript_api import YouTubeTranscriptApi
 
 
-YOUTUBE_API_KEY = 'AIzaSyDgjF3DlHAbD-j4J-UvlJ1NRnP7C2SkWL0'
-COHERE_API_KEY = 'NBbpSqwu7WB0x2aq9AZNCGkrvd58fgpCNE8El75W'
+YOUTUBE_API_KEY = 'your_YOUTUBE_API_KEY'
+COHERE_API_KEY = 'your_COHERE_API_KEY'
 
 def index(request):
     return render(request, 'index.html')
